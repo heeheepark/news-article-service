@@ -1,3 +1,5 @@
+// DB 모드 (PostgreSQL)
+
 const fs = require("fs");
 const express = require("express");
 const app = express();
@@ -6,10 +8,10 @@ app.use(express.json());
 const database = fs.readFileSync("./database.json");
 const conf = JSON.parse(database);
 
-const { Pool } = require("pg");
+const { PostgreSQL } = require("pg");
 
 // PostgreSQL 연결 정보 설정
-const db = new Pool({
+const db = new PostgreSQL({
   user: conf.user,
   host: conf.host,
   database: conf.database,
@@ -33,10 +35,14 @@ app.post("/articles", async (req, res) => {
   if (data.cateId && data.title && data.creator && data.content) {
     try {
       const result = await db.query(
-        `INSERT INTO articles (cate_id, title, creator, content) VALUES ($1, $2, $3, $4);`,
+        `INSERT INTO articles (cate_id, title, creator, content) VALUES ($1, $2, $3, $4) RETURNING id;`,
         [data.cateId, data.title, data.creator, data.content]
       );
-      res.json(result.rows[0]);
+      const insertedId = result.rows[0].id;
+      res.json({
+        id: insertedId,
+        message: "게시글이 등록되었습니다.",
+      });
     } catch (err) {
       console.log(err);
     }
@@ -48,13 +54,17 @@ app.post("/articles", async (req, res) => {
 // articles PATCH
 app.patch("/articles/:id", async (req, res) => {
   const articleId = req.params.id;
-  const updatedData = req.body;
+  const patchData = req.body;
   try {
     const result = await db.query(
-      `UPDATE articles SET title = $1, content = $2 WHERE id = $3`,
-      [updatedData.title, updatedData.content, articleId]
+      `UPDATE articles SET title = $1, content = $2 WHERE id = $3 RETURNING id`,
+      [patchData.title, patchData.content, articleId]
     );
-    res.json(result.rows[0]);
+    const updatedId = result.rows[0].id;
+    res.json({
+      id: updatedId,
+      message: "게시글이 수정되었습니다.",
+    });
   } catch (err) {
     console.log(err);
   }
@@ -67,7 +77,7 @@ app.delete("/articles/:id", async (req, res) => {
     const result = await db.query(`DELETE FROM articles WHERE id = $1`, [
       articleId,
     ]);
-    res.json(result.rows[0]);
+    res.json({ message: "게시글이 삭제되었습니다." });
   } catch (err) {
     console.log(err);
   }
