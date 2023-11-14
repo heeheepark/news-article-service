@@ -8,10 +8,10 @@ app.use(express.json());
 const database = fs.readFileSync("./database.json");
 const conf = JSON.parse(database);
 
-const { PostgreSQL } = require("pg");
+const { Pool } = require("pg");
 
 // PostgreSQL 연결 정보 설정
-const db = new PostgreSQL({
+const db = new Pool({
   user: conf.user,
   host: conf.host,
   database: conf.database,
