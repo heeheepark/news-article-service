@@ -70,48 +70,10 @@ app.get("/", (req, res) => {
 
 // 전체 기사 조회
 app.get("/articles", (req, res) => {
-  const articleCate = req.query.category;
-  if (articleCate) {
-    const articles = articleDb.articles;
-    const articlesFilter = (cateId) => {
-      return articles.filter((article) => article.cateId === cateId);
-    };
-    switch (articleCate) {
-      case "society":
-        const societyData = articlesFilter(1);
-        res.json({ ...articleDb, articles: societyData });
-        break;
-      case "politics":
-        const politicsData = articlesFilter(2);
-        res.json({ ...articleDb, articles: politicsData });
-        break;
-      case "economy":
-        const economyData = articlesFilter(3);
-        res.json({ ...articleDb, articles: economyData });
-        break;
-      case "science":
-        const scienceData = articlesFilter(4);
-        res.json({ ...articleDb, articles: scienceData });
-        break;
-      case "entertainment":
-        const entertainmentData = articlesFilter(5);
-        res.json({ ...articleDb, articles: entertainmentData });
-        break;
-      case "sports":
-        const sportsData = articlesFilter(6);
-        res.json({ ...articleDb, articles: sportsData });
-        break;
-      case "exclusivity":
-        const exclusivityData = articlesFilter(7);
-        res.json({ ...articleDb, articles: exclusivityData });
-        break;
-    }
-  } else {
-    const sortArticleData = articleDb.articles.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    res.json({ ...articleDb, articles: sortArticleData });
-  }
+  const sortArticleData = articleDb.articles.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+  res.json({ ...articleDb, articles: sortArticleData });
 });
 
 // 기사 세부 조회
@@ -153,19 +115,18 @@ app.post("/articles", (req, res) => {
 // 뉴스 기사 수정
 app.put("/articles/:articleId", (req, res) => {
   const articleId = parseInt(req.params.articleId);
-  const patchData = req.body;
+  const putData = req.body;
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
   );
   if (findArticleData) {
-    if (verifyArticleData(patchData)) {
-      findArticleData.cateId = patchData.cateId;
-      // findArticleData.cateId = patchData.cateId ?? findArticleData.cateId;
-      // findArticleData.cateId = patchData.cateId ? findArticleData.cateId : patchData.cateId;
-      findArticleData.title = patchData.title;
-      findArticleData.createdAt = patchData.createdAt;
-      findArticleData.creator = patchData.creator;
-      findArticleData.content = patchData.content;
+    if (verifyArticleData(putData)) {
+      findArticleData.cateId = putData.cateId ?? findArticleData.cateId;
+      findArticleData.title = putData.title ?? findArticleData.title;
+      findArticleData.createdAt =
+        putData.createdAt ?? findArticleData.createdAt;
+      findArticleData.creator = putData.creator ?? findArticleData.creator;
+      findArticleData.content = putData.content ?? findArticleData.content;
       res.json({
         message: "게시글이 수정되었습니다.",
         articles: articleDb.articles,
@@ -245,17 +206,18 @@ app.post("/articles/:articleId/comments", (req, res) => {
 });
 
 // 덧글 수정
-app.patch("/articles/:articleId/comments/:commentId", (req, res) => {
+app.put("/articles/:articleId/comments/:commentId", (req, res) => {
   const articleId = parseInt(req.params.articleId);
   const commentId = parseInt(req.params.commentId);
-  const patchData = req.body;
+  const putData = req.body;
   const findCommentData = commentDb.comments.find(
     (comment) => comment.id === commentId
   );
   if (findCommentData) {
-    if (verifyCommentData(patchData)) {
-      findCommentData.createdAt = patchData.createdAt;
-      findCommentData.content = patchData.content;
+    if (verifyCommentData(putData)) {
+      findCommentData.createdAt =
+        putData.createdAt ?? findCommentData.createdAt;
+      findCommentData.content = putData.content ?? findCommentData.content;
       res.json({
         message: "덧글이 수정되었습니다.",
         articleId: articleId,
