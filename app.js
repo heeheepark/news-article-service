@@ -3,7 +3,7 @@ const app = express();
 app.set("port", process.env.PORT || 3000);
 app.use(express.json());
 
-let idNum = 2;
+let articleIdNum = 2;
 let commentIdNum = 2;
 
 // article DB
@@ -74,8 +74,8 @@ app.get("/articles", (req, res) => {
 });
 
 // 기사 세부 조회
-app.get("/articles/:id", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.get("/articles/:articleId", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
   );
@@ -93,11 +93,11 @@ app.post("/articles", (req, res) => {
   const postData = req.body;
   if (verifyArticleData(postData)) {
     const newArticle = {
-      id: idNum,
+      id: articleIdNum,
       ...postData,
     };
     articleDb.articles.push(newArticle);
-    idNum += 1;
+    articleIdNum += 1;
     res.json({
       meassage: "게시글이 등록되었습니다.",
       articles: articleDb.articles,
@@ -110,8 +110,8 @@ app.post("/articles", (req, res) => {
 });
 
 // 뉴스 기사 수정
-app.patch("/articles/:id", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.patch("/articles/:articleId", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const patchData = req.body;
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
@@ -138,8 +138,8 @@ app.patch("/articles/:id", (req, res) => {
 });
 
 // 뉴스 기사 삭제
-app.delete("/articles/:id", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.delete("/articles/:articleId", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const deleteDataIdx = articleDb.articles.findIndex(
     (article) => article.id === articleId
   );
@@ -152,8 +152,8 @@ app.delete("/articles/:id", (req, res) => {
 });
 
 // 덧글 조회
-app.get("/articles/:id/comments", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.get("/articles/:articleId/comments", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
   );
@@ -169,8 +169,8 @@ app.get("/articles/:id/comments", (req, res) => {
 });
 
 // 덧글 등록
-app.post("/articles/:id/comments", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.post("/articles/:articleId/comments", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const postData = req.body;
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
@@ -202,8 +202,8 @@ app.post("/articles/:id/comments", (req, res) => {
 });
 
 // 덧글 수정
-app.patch("/articles/:id/comments/:commentId", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.patch("/articles/:articleId/comments/:commentId", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const commentId = parseInt(req.params.commentId);
   const patchData = req.body;
   const findCommentData = commentDb.comments.find(
@@ -229,8 +229,8 @@ app.patch("/articles/:id/comments/:commentId", (req, res) => {
 });
 
 // 덧글 삭제
-app.delete("/articles/:id/comments/:commentId", (req, res) => {
-  const articleId = parseInt(req.params.id);
+app.delete("/articles/:articleId/comments/:commentId", (req, res) => {
+  const articleId = parseInt(req.params.articleId);
   const commentId = parseInt(req.params.commentId);
   const findArticleData = articleDb.articles.find(
     (article) => article.id === articleId
