@@ -20,17 +20,6 @@ const articleDb = {
         "오늘도 사랑스럽개' 측이 이번주 2회 연속 방송을 결정했다. 주1회 방영의 치명적 단점을 겪어서일까. 극의 흐름을 이어가려고 노력하고 있다. MBC 수요드라마 '오늘도 사랑스럽개'(이하 '오사개')는 키스를 하면 개로 변하는 저주에 걸린 여자 해나(박규영 분)와 그 저주를 풀 수 있는 유일한 치트키지만 개를 무서워하는 남자 서원(차은우 분)의 '댕며드는' 예측불허 판타지 로맨스 드라마. 동명의 인기 웹툰을 원작으로 한 만큼 방영 전부터 드라마에 대한 기대감이 높았으나, 주1회 방송이라는 치명적 단점을 안고 가야 했다. 제작 환경은 나아졌지만 그만큼 방영 기간이 길어져 시청자들의 몰입을 방해하고, 한 번의 결방이 오랜 공백으로 이어져 극 중 흐름을 끊어내기 때문. 앞서 지난 8월 매주 목요일 주1회 편성으로 첫 방송 됐던 SBS '국민사형투표'는 '항저우 아시안게임', '플레이오프 3차전' 중계 여파로 잦은 결방을 겪어야만 했고, 15주 간의 대장정 끝에 오는 16일 마지막 방송을 앞두고 있다.",
       commentsId: [1],
     },
-    {
-      id: 2,
-      cateId: 6,
-      title:
-        "'오사개' 잦은 결방→시청률 하락 주1회 방영 쓴맛 봤나..연속편성 대책",
-      createdAt: "2023-11-14 15:48:30",
-      creator: "강가희",
-      content:
-        "오늘도 사랑스럽개' 측이 이번주 2회 연속 방송을 결정했다. 주1회 방영의 치명적 단점을 겪어서일까. 극의 흐름을 이어가려고 노력하고 있다. MBC 수요드라마 '오늘도 사랑스럽개'(이하 '오사개')는 키스를 하면 개로 변하는 저주에 걸린 여자 해나(박규영 분)와 그 저주를 풀 수 있는 유일한 치트키지만 개를 무서워하는 남자 서원(차은우 분)의 '댕며드는' 예측불허 판타지 로맨스 드라마. 동명의 인기 웹툰을 원작으로 한 만큼 방영 전부터 드라마에 대한 기대감이 높았으나, 주1회 방송이라는 치명적 단점을 안고 가야 했다. 제작 환경은 나아졌지만 그만큼 방영 기간이 길어져 시청자들의 몰입을 방해하고, 한 번의 결방이 오랜 공백으로 이어져 극 중 흐름을 끊어내기 때문. 앞서 지난 8월 매주 목요일 주1회 편성으로 첫 방송 됐던 SBS '국민사형투표'는 '항저우 아시안게임', '플레이오프 3차전' 중계 여파로 잦은 결방을 겪어야만 했고, 15주 간의 대장정 끝에 오는 16일 마지막 방송을 앞두고 있다.",
-      commentsId: [1],
-    },
   ],
 };
 
@@ -81,13 +70,13 @@ app.get("/", (req, res) => {
 
 // 전체 기사 조회
 app.get("/articles", (req, res) => {
-  const articleType = req.query.type;
-  if (articleType) {
+  const articleCate = req.query.category;
+  if (articleCate) {
     const articles = articleDb.articles;
     const articlesFilter = (cateId) => {
       return articles.filter((article) => article.cateId === cateId);
     };
-    switch (articleType) {
+    switch (articleCate) {
       case "society":
         const societyData = articlesFilter(1);
         res.json({ ...articleDb, articles: societyData });
@@ -105,8 +94,8 @@ app.get("/articles", (req, res) => {
         res.json({ ...articleDb, articles: scienceData });
         break;
       case "entertainment":
-        const articleData = articlesFilter(5);
-        res.json({ ...articleDb, articles: articleData });
+        const entertainmentData = articlesFilter(5);
+        res.json({ ...articleDb, articles: entertainmentData });
         break;
       case "sports":
         const sportsData = articlesFilter(6);
@@ -125,9 +114,6 @@ app.get("/articles", (req, res) => {
   }
 });
 
-// 특정 기사 조회
-app.get("/articles", (req, res) => {});
-
 // 기사 세부 조회
 app.get("/articles/:articleId", (req, res) => {
   const articleId = parseInt(req.params.articleId);
@@ -135,7 +121,7 @@ app.get("/articles/:articleId", (req, res) => {
     (article) => article.id === articleId
   );
   if (findArticleData) {
-    res.json(findData);
+    res.json(findArticleData);
   } else {
     res
       .status(400)
@@ -152,11 +138,11 @@ app.post("/articles", (req, res) => {
       ...postData,
     };
     articleDb.articles.push(newArticle);
-    articleIdNum += 1;
     res.json({
       meassage: "게시글이 등록되었습니다.",
-      articles: articleDb.articles,
+      article: [{ id: articleIdNum, ...newArticle }],
     });
+    articleIdNum += 1;
   } else {
     res
       .status(400)
