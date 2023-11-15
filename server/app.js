@@ -151,7 +151,7 @@ app.post("/articles", (req, res) => {
 });
 
 // 뉴스 기사 수정
-app.patch("/articles/:articleId", (req, res) => {
+app.put("/articles/:articleId", (req, res) => {
   const articleId = parseInt(req.params.articleId);
   const patchData = req.body;
   const findArticleData = articleDb.articles.find(
@@ -160,6 +160,8 @@ app.patch("/articles/:articleId", (req, res) => {
   if (findArticleData) {
     if (verifyArticleData(patchData)) {
       findArticleData.cateId = patchData.cateId;
+      // findArticleData.cateId = patchData.cateId ?? findArticleData.cateId;
+      // findArticleData.cateId = patchData.cateId ? findArticleData.cateId : patchData.cateId;
       findArticleData.title = patchData.title;
       findArticleData.createdAt = patchData.createdAt;
       findArticleData.creator = patchData.creator;
